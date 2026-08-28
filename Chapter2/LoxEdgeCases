@@ -1,0 +1,19 @@
+//This file contains edge cases for lox
+
+var a = true and "";
+var b = true and true;
+var c = false and false;
+print a;
+print b;
+print c;
+//The edge case identified is when you use empty strings, the compiler seems to not be able to intepret empty string?
+
+var d = 5;
+//d += d; no such feature
+
+var e = e;
+var subtractingString = 5 - "meow";
+// Did not expect to be able to recognize
+print subtractingString;
+
+print a;
