@@ -140,5 +140,11 @@ private Token advance() {
   
   private static class ParseError extends RuntimeException {}
 
-
+  Expr parse() {
+    try {
+      return expression();
+    } catch (ParseError error) {
+      return null;
+    }
+  }
 }
