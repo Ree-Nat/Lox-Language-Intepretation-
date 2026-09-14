@@ -11,8 +11,23 @@ class Parser {
     this.tokens = tokens;
   }
 
+  //CHALLENGE #1
+  //REPLACE EXPRESSION WITH COMMA TO MAKE COMMA ON TOP OF GGRAMMAR
  private Expr expression() {
-    return equality();
+    return comma();
+  }
+
+  private Expr comma()
+  {
+    Expr expr = equality();
+
+    while(match(COMMA))
+    {
+      Token operator = previous();
+      Expr right = equality();
+      expr = new Expr.Binary(expr, operator, right);
+    }
+    return expr;
   }
 
 
