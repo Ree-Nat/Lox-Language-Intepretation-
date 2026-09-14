@@ -55,7 +55,8 @@ class Parser {
   }
 
   //Challenge 3, -> for =, +, *, < > <= >=, match operator, 
-  // if it matches, discard but calling it again which discard right side
+  // if it matches, discard but calling it again which discard right side, go down
+  //Each grammar rule before Unary
 
 private Expr equality() {
 
@@ -99,7 +100,6 @@ private Expr comparison() {
 
 
 private Expr term() {
-    Expr expr = factor();
 
     if (match(PLUS))
     {
@@ -107,6 +107,8 @@ private Expr term() {
       term();
       return null;
     }
+
+    Expr expr = factor();
 
     while (match(TokenType.MINUS, TokenType.PLUS)) {
       Token operator = previous();
@@ -118,7 +120,6 @@ private Expr term() {
   }
 
 private Expr factor() {
-    Expr expr = unary();
 
     if (match(SLASH, STAR))
     {
@@ -126,7 +127,7 @@ private Expr factor() {
         factor();
         return null;
     }
-
+    Expr expr = unary();
     while (match(TokenType.SLASH, TokenType.STAR)) {
       Token operator = previous();
       Expr right = unary();
@@ -164,10 +165,6 @@ private Expr primary() {
       consume(RIGHT_PAREN, "Expect ')' after expression.");
       return new Expr.Grouping(expr);
     }
-
-
-    //Individually handles left hand operator if none exist
-    //Challenge level 3, -> handles error a
 
     throw error(peek(), "Expect expression.");
   }
