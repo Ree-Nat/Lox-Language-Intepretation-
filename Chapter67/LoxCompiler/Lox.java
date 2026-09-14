@@ -6,12 +6,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import LoxCompiler.*;
 
 import javax.naming.spi.Resolver;
 
 
 public class Lox {
-     private static final Interpreter interpreter = new Interpreter();
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
   public static void main(String[] args) throws IOException {
