@@ -45,7 +45,7 @@ public class GenerateAst{
       "Variable : Token name"
 //< Statements and State var-expr
     ));
-//> Statements and State stmt-ast
+//> Statements and State stmt-
 
     defineAst(outputDir, "Stmt", Arrays.asList(
 //> block-ast
