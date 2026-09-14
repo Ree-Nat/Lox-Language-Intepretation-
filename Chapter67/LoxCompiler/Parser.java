@@ -13,23 +13,46 @@ class Parser {
 
   //CHALLENGE #1
   //REPLACE EXPRESSION WITH COMMA TO MAKE COMMA ON TOP OF GGRAMMAR
+  //expression-> comma;
+  //Comma -> equality(“,”equality)* ->change Parser.java
+
+  
  private Expr expression() {
     return comma();
   }
 
-  private Expr comma()
+ private Expr comma()
   {
-    Expr expr = equality();
+    //Expr expr = equality(); //For challenge #1
+    Expr expr = Terenary();
 
     while(match(COMMA))
     {
       Token operator = previous();
-      Expr right = equality();
+      //Expr right = equality() // For challenge #1
+      Expr right = Terenary();
       expr = new Expr.Binary(expr, operator, right);
     }
     return expr;
   }
 
+  //Challenge #2
+  //Can change Grammar to 
+  // expression ->comma
+  // comma -> ternary(","ternary)*
+  // ternary -> equality ("?" expression ":"ternary)
+  //
+  private Expr Terenary(){
+    Expr conditional = equality();
+    if((match(QUESTION))){
+      Expr left_branch = equality();
+      consume(COLON, "Missing : after terenary expression");
+      Expr right_branch = Terenary(); 
+      equalObject = new Expr.Binary(conditional, left_branch, right_branch);
+    } 
+    return equalObject;
+
+  }
 
 private Expr equality() {
     Expr expr = comparison();
