@@ -1,5 +1,7 @@
 package LoxCompiler;
 
+import java.util.List;
+
 import LoxCompiler.Expr.Assign;
 import LoxCompiler.Expr.Call;
 import LoxCompiler.Expr.Get;
@@ -8,8 +10,16 @@ import LoxCompiler.Expr.Set;
 import LoxCompiler.Expr.Super;
 import LoxCompiler.Expr.This;
 import LoxCompiler.Expr.Variable;
+import LoxCompiler.Stmt.Block;
+import LoxCompiler.Stmt.Class;
+import LoxCompiler.Stmt.Function;
+import LoxCompiler.Stmt.If;
+import LoxCompiler.Stmt.Print;
+import LoxCompiler.Stmt.Return;
+import LoxCompiler.Stmt.Var;
+import LoxCompiler.Stmt.While;
 
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
 
       @Override
@@ -25,6 +35,10 @@ class Interpreter implements Expr.Visitor<Object> {
 
   private Object evaluate(Expr expr) {
     return expr.accept(this);
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
   }
 
     @Override
@@ -140,6 +154,11 @@ private boolean isEqual(Object a, Object b) {
 
     return a.equals(b);
   }
+@Override 
+public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
 
 @Override
 public Object visitAssignExpr(Assign expr) {
@@ -187,6 +206,80 @@ public Object visitThisExpr(This expr) {
 public Object visitVariableExpr(Variable expr) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
+}
+
+@Override
+public Void visitBlockStmt(Block stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitBlockStmt'");
+}
+
+@Override
+public Void visitClassStmt(Class stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitClassStmt'");
+}
+
+@Override
+public Void visitFunctionStmt(Function stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitFunctionStmt'");
+}
+
+@Override
+public Void visitIfStmt(If stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitIfStmt'");
+}
+
+@Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+    return null;
+  }
+
+
+ private String stringify(Object object) {
+    if (object == null) return "nil";
+
+    if (object instanceof Double) {
+      String text = object.toString();
+      if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
+  }
+
+  void interpret(List<Stmt> statements) {
+    try {
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+    }
+  }
+
+@Override
+public Void visitReturnStmt(Return stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitReturnStmt'");
+}
+
+@Override
+public Void visitVarStmt(Var stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitVarStmt'");
+}
+
+@Override
+public Void visitWhileStmt(While stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitWhileStmt'");
 }
 
 }
