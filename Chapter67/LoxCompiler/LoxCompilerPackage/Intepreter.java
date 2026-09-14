@@ -1,13 +1,14 @@
-package LoxCompiler;
+package LoxCompilerPackage;
 
-import LoxCompiler.Expr.Assign;
-import LoxCompiler.Expr.Call;
-import LoxCompiler.Expr.Get;
-import LoxCompiler.Expr.Logical;
-import LoxCompiler.Expr.Set;
-import LoxCompiler.Expr.Super;
-import LoxCompiler.Expr.This;
-import LoxCompiler.Expr.Variable;
+import LoxCompilerPackage.Expr.Assign;
+import LoxCompilerPackage.Expr.Call;
+import LoxCompilerPackage.Expr.Conditional;
+import LoxCompilerPackage.Expr.Get;
+import LoxCompilerPackage.Expr.Logical;
+import LoxCompilerPackage.Expr.Set;
+import LoxCompilerPackage.Expr.Super;
+import LoxCompilerPackage.Expr.This;
+import LoxCompilerPackage.Expr.Variable;
 
 class Interpreter implements Expr.Visitor<Object> {
 
@@ -188,6 +189,14 @@ public Object visitVariableExpr(Variable expr) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
 }
+
+@Override
+public Object visitConditionalExpression(Conditional expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitConditionalExpression'");
+}
+
+
 
 }
 

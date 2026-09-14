@@ -1,5 +1,7 @@
-package LoxCompiler;
+package LoxCompilerPackage;
 import java.util.List;
+
+import LoxCompilerPackage.*;
 
 abstract class Expr {
   interface Visitor<R> {
@@ -15,6 +17,8 @@ abstract class Expr {
     R visitThisExpr(This expr);
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
+    R visitConditionalExpression(Conditional expr);
+    String visitConditionalExpr(Conditional expr);
   }
 
   // Nested Expr classes here...
@@ -53,6 +57,28 @@ abstract class Expr {
   }
 //< expr-binary
 //> expr-call
+
+  //challenge 2 chapter 6
+  //Have expression be expression of expression rather than literals or operators
+   static class Conditional extends Expr {
+      Conditional(Expr left_branch, Expr operator, Expr right_branch) {
+      this.left = left_branch;
+      this.operator = operator;
+      this.right = right_branch;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitConditionalExpression(this);
+    }
+
+    final Expr left;
+    final Expr operator;
+    final Expr right;
+  }
+
+
+
   static class Call extends Expr {
     Call(Expr callee, Token paren, List<Expr> arguments) {
       this.callee = callee;

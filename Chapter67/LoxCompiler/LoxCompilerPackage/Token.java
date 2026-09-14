@@ -1,4 +1,6 @@
-package LoxCompiler;
+package LoxCompilerPackage;
+import  LoxCompilerPackage.*;
+
 class Token {
   final TokenType type;
   final String lexeme;

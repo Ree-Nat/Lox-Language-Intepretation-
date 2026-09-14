@@ -1,13 +1,16 @@
-package LoxCompiler;
-import LoxCompiler.*;
-import LoxCompiler.Expr.Assign;
-import LoxCompiler.Expr.Call;
-import LoxCompiler.Expr.Get;
-import LoxCompiler.Expr.Logical;
-import LoxCompiler.Expr.Set;
-import LoxCompiler.Expr.Super;
-import LoxCompiler.Expr.This;
-import LoxCompiler.Expr.Variable;
+package LoxCompilerPackage;
+import LoxCompilerPackage.*;
+
+import LoxCompilerPackage.Expr.Assign;
+import LoxCompilerPackage.Expr.Call;
+import LoxCompilerPackage.Expr.Conditional;
+import LoxCompilerPackage.Expr.Get;
+import LoxCompilerPackage.Expr.Logical;
+import LoxCompilerPackage.Expr.Set;
+import LoxCompilerPackage.Expr.Super;
+import LoxCompilerPackage.Expr.This;
+import LoxCompilerPackage.Expr.Variable;
+
 class AstPrinter implements Expr.Visitor<String> {
   String print(Expr expr) {
     return expr.accept(this);
@@ -17,6 +20,13 @@ class AstPrinter implements Expr.Visitor<String> {
     @Override
   public String visitBinaryExpr(Expr.Binary expr) {
     return parenthesize(expr.operator.lexeme,
+                        expr.left, expr.right);
+  }
+
+  @Override 
+  public String visitConditionalExpr(Expr.Conditional expr)
+  {
+      return parenthesize("?", expr.operator,
                         expr.left, expr.right);
   }
 
@@ -115,6 +125,13 @@ public String visitThisExpr(This expr) {
 public String visitVariableExpr(Variable expr) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
+}
+
+
+@Override
+public String visitConditionalExpression(Conditional expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitConditionalExpression'");
 }
 
 

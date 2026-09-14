@@ -1,4 +1,4 @@
-package LoxCompiler;
+package LoxCompilerPackage;
 
 class RuntimeError extends RuntimeException {
   final Token token;

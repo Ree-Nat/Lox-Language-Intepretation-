@@ -1,4 +1,4 @@
-package LoxCompiler;
+package LoxCompilerPackage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;

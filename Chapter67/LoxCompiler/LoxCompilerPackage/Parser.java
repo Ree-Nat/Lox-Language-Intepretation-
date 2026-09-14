@@ -1,5 +1,5 @@
-package LoxCompiler;
-import static LoxCompiler.TokenType.*;
+package LoxCompilerPackage;
+import static LoxCompilerPackage.TokenType.*;
 
 import java.util.List;
 
@@ -48,9 +48,9 @@ class Parser {
       Expr left_branch = expression();
       consume(COLON, "Missing : after terenary expression");
       Expr right_branch = Terenary(); 
-      equalObject = new Expr.Binary(conditional, left_branch, right_branch);
+      conditional = new Expr.Conditional(conditional, left_branch, right_branch);
     } 
-    return equalObject;
+    return conditional;
 
   }
 
