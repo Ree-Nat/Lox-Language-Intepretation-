@@ -45,7 +45,7 @@ class Parser {
   private Expr Terenary(){
     Expr conditional = equality();
     if((match(QUESTION))){
-      Expr left_branch = equality();
+      Expr left_branch = expression();
       consume(COLON, "Missing : after terenary expression");
       Expr right_branch = Terenary(); 
       equalObject = new Expr.Binary(conditional, left_branch, right_branch);
