@@ -42,10 +42,7 @@ class Interpreter implements Expr.Visitor<Object> {
     return null;
   }
 
-private void checkNumberOperand(Token operator, Object operand) {
-    if (operand instanceof Double) return;
-    throw new RuntimeError(operator, "Operand must be a number.");
-  }
+
 
 
 private boolean isTruthy(Object object) {
@@ -53,6 +50,8 @@ private boolean isTruthy(Object object) {
     if (object instanceof Boolean) return (boolean)object;
     return true;
   }
+
+
 
 
 
@@ -127,10 +126,37 @@ private boolean isTruthy(Object object) {
     return null;
   }
 
+  private String stringify(Object object) {
+    if (object == null) return "nil";
+
+    if (object instanceof Double) {
+      String text = object.toString();
+      if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
+  }
+
 private void checkNumberOperands(Token operator,
                                    Object left, Object right) {
-    if (left instanceof Double && right instanceof Double) return;
+
+    if (left instanceof Double && right instanceof Double && operator.type == TokenType.SLASH)
+      {
+        if ((Double) right == 0)
+        {
+          throw new RuntimeError(operator, "Divisor can not be 0");
+        }
+      else
+      {
+        return;
+      }
+
+      };
     
+   
     throw new RuntimeError(operator, "Operands must be numbers.");
   }
 
@@ -140,6 +166,16 @@ private boolean isEqual(Object a, Object b) {
     if (a == null) return false;
 
     return a.equals(b);
+  }
+
+
+void interpret(Expr expression) { 
+    try {
+      Object value = evaluate(expression);
+      System.out.println(stringify(value));
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+    }
   }
 
 @Override

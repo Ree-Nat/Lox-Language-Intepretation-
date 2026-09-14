@@ -21,26 +21,11 @@ class AstPrinter implements Expr.Visitor<String> {
     @Override
   public String visitBinaryExpr(Expr.Binary expr) {
 
-    checkIfZero(expr.left, expr.operator, expr.right);
 
     return parenthesize(expr.operator.lexeme,
                         expr.left, expr.right);
   }
 
-  public void checkIfZero(Expr left, Token operator, Expr right)
-  {
-    switch(operator.type)
-    {
-      case TokenType.SLASH:
-        if(right.equals(0) || right.equals("0"))
-        {
-          throw new RuntimeError(operator, "Divisor can't be zero" );
-        }
-        break;
-      default:
-        break;
-      }
-    }
   
 
   @Override 

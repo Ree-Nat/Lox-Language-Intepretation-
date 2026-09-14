@@ -6,12 +6,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import LoxCompilerPackage.Interpreter;
 
 
 
 public class Lox {
-    private static final Interpreter intepreter = new LoxCompilerPackage.Interpreter();
+    private static final Interpreter inter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
   public static void main(String[] args) throws IOException {
@@ -53,8 +52,12 @@ public class Lox {
     Parser parser = new Parser(tokens);
     Expr expression = parser.parse();
 
+
+    inter.interpret(expression);
     // Stop if there was a syntax error.
     if (hadError) return;
+
+    
 
     System.out.println(new AstPrinter().print(expression));
   }
