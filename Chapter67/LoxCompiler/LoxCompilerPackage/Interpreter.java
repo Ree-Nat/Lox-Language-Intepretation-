@@ -97,9 +97,24 @@ private boolean isTruthy(Object object) {
         if (left instanceof Double && right instanceof Double) {
           return (double)left + (double)right;
         } // [plus]
-
         if (left instanceof String && right instanceof String) {
           return (String)left + (String)right;
+        }
+        if((left instanceof String && right instanceof Double))
+        {
+            String rightString = right.toString();
+            String leftString = left.toString();
+            String concatString = leftString.concat(rightString);
+            Object obj = concatString;
+            return obj;
+        }
+        if((left instanceof Double && right instanceof String))
+        {
+            String rightString = right.toString();
+            String leftString = left.toString();
+            String concatString = leftString.concat(rightString);
+            Object obj = concatString;
+            return obj;
         }
 
 /* Evaluating Expressions binary-plus < Evaluating Expressions string-wrong-type
@@ -140,6 +155,8 @@ private boolean isTruthy(Object object) {
     return object.toString();
   }
 
+
+  //Challenge Problem 3 Chapter 7
 private void checkNumberOperands(Token operator,
                                    Object left, Object right) {
 
@@ -167,6 +184,7 @@ private boolean isEqual(Object a, Object b) {
 
     return a.equals(b);
   }
+
 
 
 void interpret(Expr expression) { 
