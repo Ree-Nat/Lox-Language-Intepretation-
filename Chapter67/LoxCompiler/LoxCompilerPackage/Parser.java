@@ -54,7 +54,18 @@ class Parser {
 
   }
 
+  //Challenge 3, -> for =, +, *, < > <= >=, match operator, 
+  // if it matches, discard but calling it again which discard right side
+
 private Expr equality() {
+
+    if (match(BANG_EQUAL, EQUAL_EQUAL))
+    {
+      error(previous(), "Missing left hand operand");
+      equality(); // discard right operator, go down
+      return null;
+    }
+
     Expr expr = comparison();
 
     while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
@@ -67,6 +78,14 @@ private Expr equality() {
   }
 
 private Expr comparison() {
+
+    if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
+    {
+      error(previous(), "Missing left hand operand");
+      comparison(); // go left
+      return null;
+    }
+
     Expr expr = term();
 
     while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
@@ -82,6 +101,13 @@ private Expr comparison() {
 private Expr term() {
     Expr expr = factor();
 
+    if (match(PLUS))
+    {
+      error(previous(), "Missing left hand operand");
+      term();
+      return null;
+    }
+
     while (match(TokenType.MINUS, TokenType.PLUS)) {
       Token operator = previous();
       Expr right = factor();
@@ -94,6 +120,13 @@ private Expr term() {
 private Expr factor() {
     Expr expr = unary();
 
+    if (match(SLASH, STAR))
+    {
+        error(previous(), "Missing left hand operand");
+        factor();
+        return null;
+    }
+
     while (match(TokenType.SLASH, TokenType.STAR)) {
       Token operator = previous();
       Expr right = unary();
@@ -105,6 +138,8 @@ private Expr factor() {
 
 
   private Expr unary() {
+
+
     if (match(TokenType.BANG, TokenType.MINUS)) {
       Token operator = previous();
       Expr right = unary();
@@ -129,6 +164,10 @@ private Expr primary() {
       consume(RIGHT_PAREN, "Expect ')' after expression.");
       return new Expr.Grouping(expr);
     }
+
+
+    //Individually handles left hand operator if none exist
+    //Challenge level 3, -> handles error a
 
     throw error(peek(), "Expect expression.");
   }

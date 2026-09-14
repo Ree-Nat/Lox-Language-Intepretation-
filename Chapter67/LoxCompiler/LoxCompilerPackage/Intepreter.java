@@ -196,6 +196,12 @@ public Object visitConditionalExpression(Conditional expr) {
   throw new UnsupportedOperationException("Unimplemented method 'visitConditionalExpression'");
 }
 
+@Override
+public String visitConditionalExpr(Conditional expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitConditionalExpr'");
+}
+
 
 
 }
