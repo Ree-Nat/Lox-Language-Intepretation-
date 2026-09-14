@@ -1,5 +1,14 @@
 package LoxCompiler;
 
+import LoxCompiler.Expr.Assign;
+import LoxCompiler.Expr.Call;
+import LoxCompiler.Expr.Get;
+import LoxCompiler.Expr.Logical;
+import LoxCompiler.Expr.Set;
+import LoxCompiler.Expr.Super;
+import LoxCompiler.Expr.This;
+import LoxCompiler.Expr.Variable;
+
 class Interpreter implements Expr.Visitor<Object> {
 
 
@@ -131,6 +140,54 @@ private boolean isEqual(Object a, Object b) {
 
     return a.equals(b);
   }
+
+@Override
+public Object visitAssignExpr(Assign expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitAssignExpr'");
+}
+
+@Override
+public Object visitCallExpr(Call expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitCallExpr'");
+}
+
+@Override
+public Object visitGetExpr(Get expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitGetExpr'");
+}
+
+@Override
+public Object visitLogicalExpr(Logical expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitLogicalExpr'");
+}
+
+@Override
+public Object visitSetExpr(Set expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitSetExpr'");
+}
+
+@Override
+public Object visitSuperExpr(Super expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitSuperExpr'");
+}
+
+@Override
+public Object visitThisExpr(This expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitThisExpr'");
+}
+
+@Override
+public Object visitVariableExpr(Variable expr) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
+}
 
 }
 

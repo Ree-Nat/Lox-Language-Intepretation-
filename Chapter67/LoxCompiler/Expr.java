@@ -1,6 +1,4 @@
-//> Appendix II expr
 package LoxCompiler;
-
 import java.util.List;
 
 abstract class Expr {
@@ -214,5 +212,6 @@ abstract class Expr {
 //< expr-variable
 
   abstract <R> R accept(Visitor<R> visitor);
+
 }
 //< Appendix II expr

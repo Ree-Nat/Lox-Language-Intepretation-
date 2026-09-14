@@ -1,6 +1,5 @@
 //> Appendix II stmt
 package LoxCompiler;
-import LoxCompiler.*;
 
 import java.util.List;
 

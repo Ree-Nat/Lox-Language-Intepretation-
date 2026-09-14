@@ -1,4 +1,4 @@
-package Exercise56;
+package LoxCompiler;
 import java.util.List;
 
 abstract class Expr {
