@@ -1,5 +1,7 @@
 package src.LoxCompiler;
 
+import java.util.List;
+
 import src.LoxCompiler.Expr.Assign;
 import src.LoxCompiler.Expr.Call;
 import src.LoxCompiler.Expr.Get;
@@ -8,8 +10,17 @@ import src.LoxCompiler.Expr.Set;
 import src.LoxCompiler.Expr.Super;
 import src.LoxCompiler.Expr.This;
 import src.LoxCompiler.Expr.Variable;
+import src.LoxCompiler.Stmt.Block;
+import src.LoxCompiler.Stmt.Class;
+import src.LoxCompiler.Stmt.Expression;
+import src.LoxCompiler.Stmt.Function;
+import src.LoxCompiler.Stmt.If;
+import src.LoxCompiler.Stmt.Print;
+import src.LoxCompiler.Stmt.Return;
+import src.LoxCompiler.Stmt.Var;
+import src.LoxCompiler.Stmt.While;
 
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 
       @Override
@@ -186,14 +197,17 @@ private boolean isEqual(Object a, Object b) {
 
 
 
-void interpret(Expr expression) { 
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(stringify(value));
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
   }
+
+  
 
 @Override
 public Object visitAssignExpr(Assign expr) {
@@ -241,6 +255,60 @@ public Object visitThisExpr(This expr) {
 public Object visitVariableExpr(Variable expr) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
+}
+
+@Override
+public Void visitBlockStmt(Block stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitBlockStmt'");
+}
+
+@Override
+public Void visitClassStmt(Class stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitClassStmt'");
+}
+
+@Override
+public Void visitExpressionStmt(Expression stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitExpressionStmt'");
+}
+
+@Override
+public Void visitFunctionStmt(Function stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitFunctionStmt'");
+}
+
+@Override
+public Void visitIfStmt(If stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitIfStmt'");
+}
+
+@Override
+public Void visitPrintStmt(Print stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitPrintStmt'");
+}
+
+@Override
+public Void visitReturnStmt(Return stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitReturnStmt'");
+}
+
+@Override
+public Void visitVarStmt(Var stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitVarStmt'");
+}
+
+@Override
+public Void visitWhileStmt(While stmt) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitWhileStmt'");
 }
 
 
