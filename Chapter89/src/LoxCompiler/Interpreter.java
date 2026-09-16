@@ -38,6 +38,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     return expr.accept(this);
   }
 
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+    return null;
+  }
+
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
+  }
+
     @Override
   public Object visitUnaryExpr(Expr.Unary expr) {
     Object right = evaluate(expr.right);
@@ -207,7 +225,7 @@ private boolean isEqual(Object a, Object b) {
     }
   }
 
-  
+
 
 @Override
 public Object visitAssignExpr(Assign expr) {
@@ -270,12 +288,6 @@ public Void visitClassStmt(Class stmt) {
 }
 
 @Override
-public Void visitExpressionStmt(Expression stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitExpressionStmt'");
-}
-
-@Override
 public Void visitFunctionStmt(Function stmt) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitFunctionStmt'");
@@ -287,11 +299,6 @@ public Void visitIfStmt(If stmt) {
   throw new UnsupportedOperationException("Unimplemented method 'visitIfStmt'");
 }
 
-@Override
-public Void visitPrintStmt(Print stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitPrintStmt'");
-}
 
 @Override
 public Void visitReturnStmt(Return stmt) {

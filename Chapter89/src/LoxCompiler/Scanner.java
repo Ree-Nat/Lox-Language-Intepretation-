@@ -122,7 +122,7 @@ class Scanner {
         while (isAlphaNumeric(peek())) advance();
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
-        addToken(TokenType.IDENTIFIER);
+        addToken(type);
     }
 
     private boolean isDigit(char c) {
