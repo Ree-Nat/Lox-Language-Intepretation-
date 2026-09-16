@@ -22,6 +22,8 @@ import src.LoxCompiler.Stmt.While;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    private Environment environment = new Environment();
+
 
       @Override
   public Object visitLiteralExpr(Expr.Literal expr) {
@@ -271,8 +273,7 @@ public Object visitThisExpr(This expr) {
 
 @Override
 public Object visitVariableExpr(Variable expr) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
+  return environment.get(expr.name);
 }
 
 @Override
@@ -307,9 +308,14 @@ public Void visitReturnStmt(Return stmt) {
 }
 
 @Override
-public Void visitVarStmt(Var stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitVarStmt'");
+public Void visitVarStmt(Stmt.Var stmt) {
+    Object value = null;
+    if (stmt.initializer != null) {
+      value = evaluate(stmt.initializer);
+    }
+
+    environment.define(stmt.name.lexeme, value);
+    return null;
 }
 
 @Override
