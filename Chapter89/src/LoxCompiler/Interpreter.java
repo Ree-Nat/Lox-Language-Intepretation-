@@ -58,6 +58,20 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     stmt.accept(this);
   }
 
+  void executeBlock(List<Stmt> statements,
+                    Environment environment) {
+    Environment previous = this.environment;
+    try {
+      this.environment = environment;
+
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
+  }
+
     @Override
   public Object visitUnaryExpr(Expr.Unary expr) {
     Object right = evaluate(expr.right);
@@ -231,9 +245,12 @@ private boolean isEqual(Object a, Object b) {
 
 @Override
 public Object visitAssignExpr(Assign expr) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitAssignExpr'");
+    Object value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
 }
+
+
 
 @Override
 public Object visitCallExpr(Call expr) {
@@ -278,8 +295,8 @@ public Object visitVariableExpr(Variable expr) {
 
 @Override
 public Void visitBlockStmt(Block stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitBlockStmt'");
+    executeBlock(stmt.statements, new Environment(environment));
+    return null;
 }
 
 @Override
