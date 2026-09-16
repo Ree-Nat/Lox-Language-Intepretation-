@@ -1,25 +1,15 @@
-package LoxCompiler;
+package src.LoxCompiler;
 
-import java.util.List;
+import src.LoxCompiler.Expr.Assign;
+import src.LoxCompiler.Expr.Call;
+import src.LoxCompiler.Expr.Get;
+import src.LoxCompiler.Expr.Logical;
+import src.LoxCompiler.Expr.Set;
+import src.LoxCompiler.Expr.Super;
+import src.LoxCompiler.Expr.This;
+import src.LoxCompiler.Expr.Variable;
 
-import LoxCompiler.Expr.Assign;
-import LoxCompiler.Expr.Call;
-import LoxCompiler.Expr.Get;
-import LoxCompiler.Expr.Logical;
-import LoxCompiler.Expr.Set;
-import LoxCompiler.Expr.Super;
-import LoxCompiler.Expr.This;
-import LoxCompiler.Expr.Variable;
-import LoxCompiler.Stmt.Block;
-import LoxCompiler.Stmt.Class;
-import LoxCompiler.Stmt.Function;
-import LoxCompiler.Stmt.If;
-import LoxCompiler.Stmt.Print;
-import LoxCompiler.Stmt.Return;
-import LoxCompiler.Stmt.Var;
-import LoxCompiler.Stmt.While;
-
-class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
+class Interpreter implements Expr.Visitor<Object> {
 
 
       @Override
@@ -37,10 +27,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     return expr.accept(this);
   }
 
-  private void execute(Stmt stmt) {
-    stmt.accept(this);
-  }
-
     @Override
   public Object visitUnaryExpr(Expr.Unary expr) {
     Object right = evaluate(expr.right);
@@ -55,10 +41,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     return null;
   }
 
-private void checkNumberOperand(Token operator, Object operand) {
-    if (operand instanceof Double) return;
-    throw new RuntimeError(operator, "Operand must be a number.");
-  }
+
 
 
 private boolean isTruthy(Object object) {
@@ -66,6 +49,8 @@ private boolean isTruthy(Object object) {
     if (object instanceof Boolean) return (boolean)object;
     return true;
   }
+
+
 
 
 
@@ -111,9 +96,24 @@ private boolean isTruthy(Object object) {
         if (left instanceof Double && right instanceof Double) {
           return (double)left + (double)right;
         } // [plus]
-
         if (left instanceof String && right instanceof String) {
           return (String)left + (String)right;
+        }
+        if((left instanceof String && right instanceof Double))
+        {
+            String rightString = right.toString();
+            String leftString = left.toString();
+            String concatString = leftString.concat(rightString);
+            Object obj = concatString;
+            return obj;
+        }
+        if((left instanceof Double && right instanceof String))
+        {
+            String rightString = right.toString();
+            String leftString = left.toString();
+            String concatString = leftString.concat(rightString);
+            Object obj = concatString;
+            return obj;
         }
 
 /* Evaluating Expressions binary-plus < Evaluating Expressions string-wrong-type
@@ -140,10 +140,39 @@ private boolean isTruthy(Object object) {
     return null;
   }
 
+  private String stringify(Object object) {
+    if (object == null) return "nil";
+
+    if (object instanceof Double) {
+      String text = object.toString();
+      if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
+  }
+
+
+  //Challenge Problem 3 Chapter 7
 private void checkNumberOperands(Token operator,
                                    Object left, Object right) {
-    if (left instanceof Double && right instanceof Double) return;
+
+    if (left instanceof Double && right instanceof Double && operator.type == TokenType.SLASH)
+      {
+        if ((Double) right == 0)
+        {
+          throw new RuntimeError(operator, "Divisor can not be 0");
+        }
+      else
+      {
+        return;
+      }
+
+      };
     
+   
     throw new RuntimeError(operator, "Operands must be numbers.");
   }
 
@@ -154,10 +183,16 @@ private boolean isEqual(Object a, Object b) {
 
     return a.equals(b);
   }
-@Override 
-public Void visitExpressionStmt(Stmt.Expression stmt) {
-    evaluate(stmt.expression);
-    return null;
+
+
+
+void interpret(Expr expression) { 
+    try {
+      Object value = evaluate(expression);
+      System.out.println(stringify(value));
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+    }
   }
 
 @Override
@@ -208,79 +243,6 @@ public Object visitVariableExpr(Variable expr) {
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
 }
 
-@Override
-public Void visitBlockStmt(Block stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitBlockStmt'");
-}
-
-@Override
-public Void visitClassStmt(Class stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitClassStmt'");
-}
-
-@Override
-public Void visitFunctionStmt(Function stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitFunctionStmt'");
-}
-
-@Override
-public Void visitIfStmt(If stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitIfStmt'");
-}
-
-@Override
-  public Void visitPrintStmt(Stmt.Print stmt) {
-    Object value = evaluate(stmt.expression);
-    System.out.println(stringify(value));
-    return null;
-  }
-
-
- private String stringify(Object object) {
-    if (object == null) return "nil";
-
-    if (object instanceof Double) {
-      String text = object.toString();
-      if (text.endsWith(".0")) {
-        text = text.substring(0, text.length() - 2);
-      }
-      return text;
-    }
-
-    return object.toString();
-  }
-
-  void interpret(List<Stmt> statements) {
-    try {
-      for (Stmt statement : statements) {
-        execute(statement);
-      }
-    } catch (RuntimeError error) {
-      Lox.runtimeError(error);
-    }
-  }
-
-@Override
-public Void visitReturnStmt(Return stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitReturnStmt'");
-}
-
-@Override
-public Void visitVarStmt(Var stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitVarStmt'");
-}
-
-@Override
-public Void visitWhileStmt(While stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitWhileStmt'");
-}
 
 }
 

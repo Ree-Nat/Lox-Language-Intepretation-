@@ -1,10 +1,9 @@
-package LoxCompiler;
+package src.LoxCompiler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 
 class Scanner {
@@ -64,6 +63,9 @@ class Scanner {
             case '+': addToken(TokenType.PLUS); break;
             case ';': addToken(TokenType.SEMICOLON); break;
             case '*': addToken(TokenType.STAR); break; 
+            case ':': addToken(TokenType.COLON); break;
+            //Challenge level 2
+            case '?': addToken(TokenType.QUESTION); break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                 break;

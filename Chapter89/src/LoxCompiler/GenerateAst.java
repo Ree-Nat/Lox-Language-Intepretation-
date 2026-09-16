@@ -1,4 +1,4 @@
-package LoxCompiler;
+package src.LoxCompiler;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class GenerateAst{
       "Variable : Token name"
 //< Statements and State var-expr
     ));
-//> Statements and State stmt-
+//> Statements and State stmt-ast
 
     defineAst(outputDir, "Stmt", Arrays.asList(
 //> block-ast

@@ -1,7 +1,6 @@
-package LoxCompiler;
-import static LoxCompiler.TokenType.*;
+package src.LoxCompiler;
+import static src.LoxCompiler.TokenType.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
@@ -12,12 +11,21 @@ class Parser {
     this.tokens = tokens;
   }
 
+
  private Expr expression() {
     return equality();
-  }
 
+ }
 
 private Expr equality() {
+
+    if (match(BANG_EQUAL, EQUAL_EQUAL))
+    {
+      error(previous(), "Missing left hand operand");
+      equality(); 
+      return null;
+    }
+
     Expr expr = comparison();
 
     while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
@@ -30,6 +38,14 @@ private Expr equality() {
   }
 
 private Expr comparison() {
+
+    if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
+    {
+      error(previous(), "Missing left hand operand");
+      comparison(); // go left
+      return null;
+    }
+
     Expr expr = term();
 
     while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
@@ -43,6 +59,14 @@ private Expr comparison() {
 
 
 private Expr term() {
+
+    if (match(PLUS))
+    {
+      error(previous(), "Missing left hand operand");
+      term();
+      return null;
+    }
+
     Expr expr = factor();
 
     while (match(TokenType.MINUS, TokenType.PLUS)) {
@@ -55,8 +79,14 @@ private Expr term() {
   }
 
 private Expr factor() {
-    Expr expr = unary();
 
+    if (match(SLASH, STAR))
+    {
+        error(previous(), "Missing left hand operand");
+        factor();
+        return null;
+    }
+    Expr expr = unary();
     while (match(TokenType.SLASH, TokenType.STAR)) {
       Token operator = previous();
       Expr right = unary();
@@ -68,6 +98,8 @@ private Expr factor() {
 
 
   private Expr unary() {
+
+
     if (match(TokenType.BANG, TokenType.MINUS)) {
       Token operator = previous();
       Expr right = unary();
@@ -142,30 +174,11 @@ private Token advance() {
   
   private static class ParseError extends RuntimeException {}
 
-  List<Stmt> parse() {
-    List<Stmt> statements = new ArrayList<>();
-    while (!isAtEnd()) {
-      statements.add(statement());
+  Expr parse() {
+    try {
+      return expression();
+    } catch (ParseError error) {
+      return null;
     }
-
-    return statements; 
-  }
-
-  private Stmt statement() {
-    if (match(PRINT)) return printStatement();
-
-    return expressionStatement();
-  }
-
-  private Stmt printStatement() {
-    Expr value = expression();
-    consume(SEMICOLON, "Expect ';' after value.");
-    return new Stmt.Print(value);
-  }
-
-  private Stmt expressionStatement() {
-    Expr expr = expression();
-    consume(SEMICOLON, "Expect ';' after expression.");
-    return new Stmt.Expression(expr);
   }
 }

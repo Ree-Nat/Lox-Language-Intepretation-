@@ -1,24 +1,33 @@
-package LoxCompiler;
-import LoxCompiler.*;
-import LoxCompiler.Expr.Assign;
-import LoxCompiler.Expr.Call;
-import LoxCompiler.Expr.Get;
-import LoxCompiler.Expr.Logical;
-import LoxCompiler.Expr.Set;
-import LoxCompiler.Expr.Super;
-import LoxCompiler.Expr.This;
-import LoxCompiler.Expr.Variable;
+package src.LoxCompiler;
+import src.LoxCompiler.*;
+
+import src.LoxCompiler.Expr.Assign;
+import src.LoxCompiler.Expr.Call;
+import src.LoxCompiler.Expr.Get;
+import src.LoxCompiler.Expr.Logical;
+import src.LoxCompiler.Expr.Set;
+import src.LoxCompiler.Expr.Super;
+import src.LoxCompiler.Expr.This;
+import src.LoxCompiler.Expr.Variable;
+
 class AstPrinter implements Expr.Visitor<String> {
   String print(Expr expr) {
     return expr.accept(this);
   }
 
 
+  //Challenge #1 
     @Override
   public String visitBinaryExpr(Expr.Binary expr) {
+
+
     return parenthesize(expr.operator.lexeme,
                         expr.left, expr.right);
   }
+
+  
+
+ 
 
   @Override
   public String visitGroupingExpr(Expr.Grouping expr) {
@@ -116,6 +125,9 @@ public String visitVariableExpr(Variable expr) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
 }
+
+
+
 
 
 

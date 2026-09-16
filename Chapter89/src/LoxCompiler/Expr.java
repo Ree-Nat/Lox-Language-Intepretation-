@@ -1,5 +1,5 @@
 //> Appendix II expr
-package LoxCompiler;
+package src.LoxCompiler;
 
 import java.util.List;
 
