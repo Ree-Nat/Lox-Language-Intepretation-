@@ -14,6 +14,7 @@ import src.LoxCompiler.Expr.Super;
 import src.LoxCompiler.Expr.This;
 import src.LoxCompiler.Expr.Variable;
 import src.LoxCompiler.Stmt.Block;
+import src.LoxCompiler.Stmt.Break;
 import src.LoxCompiler.Stmt.Class;
 import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.If;
@@ -24,7 +25,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
     private List<Stmt> evaluatedExpressionStatements = new ArrayList<>();
-
+    private static class BreakException extends RuntimeException {}
 
       @Override
   public Object visitLiteralExpr(Expr.Literal expr) {
@@ -361,10 +362,21 @@ public Void visitVarStmt(Stmt.Var stmt) {
 
 @Override
 public Void visitWhileStmt(Stmt.While stmt) {
+  try{
     while (isTruthy(evaluate(stmt.condition))) {
       execute(stmt.body);
     }
+    }
+    catch (BreakException e)
+    {
+
+    }
     return null;
+}
+
+@Override
+public Void visitBreakStmt(Break stmt) {
+  throw new BreakException();
 }
 }
 
