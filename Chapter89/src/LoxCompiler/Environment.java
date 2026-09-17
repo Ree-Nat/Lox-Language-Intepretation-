@@ -16,6 +16,7 @@ public class Environment {
     values.put(name, value);
   }
 
+  //challenge #2 for chapter 8, throws a runtime error if accessed variable is null
   Object get(Token name) {
     if (values.containsKey(name.lexeme)) {
 
