@@ -13,6 +13,8 @@ public class Lox {
     private static final Interpreter inter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
+    static boolean repl_mode = false;
+
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
       System.out.println("Usage: jlox [script]");
@@ -20,6 +22,7 @@ public class Lox {
     } else if (args.length == 1) {
       runFile(args[0]);
     } else {
+      repl_mode = true;
       runPrompt();
     }
     
@@ -55,8 +58,18 @@ public class Lox {
     // Stop if there was a syntax error.
     if (hadError) return;
 
+    
     inter.interpret(statements);
-
+    if(repl_mode == true)
+    {
+      for(Stmt statement: statements)
+      {
+        if(statement instanceof Stmt.Expression)
+        {
+          System.out.println(inter.stringExpression((Stmt.Expression) statement));
+        }
+      }
+    }
   
   }
 

@@ -1,5 +1,6 @@
 package src.LoxCompiler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import src.LoxCompiler.Expr.Assign;
@@ -20,6 +21,7 @@ import src.LoxCompiler.Stmt.While;
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
+    private List<Stmt> evaluatedExpressionStatements = new ArrayList<>();
 
 
       @Override
@@ -40,9 +42,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluatedExpressionStatements.add(stmt);
     evaluate(stmt.expression);
     return null;
   }
+
 
   public String stringExpression(Stmt.Expression stmt)
   {
