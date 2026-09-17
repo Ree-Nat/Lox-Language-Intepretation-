@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
+
+  private static class ParseError extends RuntimeException {}
+
   private final List<Token> tokens;
   private int current = 0;
 
@@ -206,12 +209,28 @@ private Token advance() {
     return new ParseError();
   }
 
-  private void synchronize()
-  {
+  private void synchronize() {
     advance();
+
+    while (!isAtEnd()) {
+      if (previous().type == SEMICOLON) return;
+
+      switch (peek().type) {
+        case CLASS:
+        case FUN:
+        case VAR:
+        case FOR:
+        case IF:
+        case WHILE:
+        case PRINT:
+        case RETURN:
+          return;
+      }
+
+      advance();
+    }
   }
   
-  private static class ParseError extends RuntimeException {}
 
   List<Stmt> parse() {
     List<Stmt> statements = new ArrayList<>();

@@ -52,10 +52,10 @@ public class Lox {
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
 
-
-    inter.interpret(statements);
     // Stop if there was a syntax error.
     if (hadError) return;
+
+    inter.interpret(statements);
 
   
   }
