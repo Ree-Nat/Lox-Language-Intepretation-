@@ -12,12 +12,9 @@ import src.LoxCompiler.Expr.This;
 import src.LoxCompiler.Expr.Variable;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Class;
-import src.LoxCompiler.Stmt.Expression;
 import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.If;
-import src.LoxCompiler.Stmt.Print;
 import src.LoxCompiler.Stmt.Return;
-import src.LoxCompiler.Stmt.Var;
 import src.LoxCompiler.Stmt.While;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -242,7 +239,7 @@ private boolean isEqual(Object a, Object b) {
   }
 
 
-
+//Assigns a variable
 @Override
 public Object visitAssignExpr(Assign expr) {
     Object value = evaluate(expr.value);
@@ -324,6 +321,7 @@ public Void visitReturnStmt(Return stmt) {
   throw new UnsupportedOperationException("Unimplemented method 'visitReturnStmt'");
 }
 
+//
 @Override
 public Void visitVarStmt(Stmt.Var stmt) {
     Object value = null;
@@ -340,7 +338,5 @@ public Void visitWhileStmt(While stmt) {
   // TODO Auto-generated method stub
   throw new UnsupportedOperationException("Unimplemented method 'visitWhileStmt'");
 }
-
-
 }
 

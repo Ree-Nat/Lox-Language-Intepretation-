@@ -1,14 +1,10 @@
 package src.LoxCompiler;
 import java.util.HashMap;
 import java.util.Map;
-
-
-class Environment {
-
+public class Environment {
   private final Map<String, Object> values = new HashMap<>();
-  final Environment enclosing; 
-
-   Environment() {
+  final Environment enclosing;
+  Environment() {
     enclosing = null;
   }
 
@@ -16,8 +12,11 @@ class Environment {
     this.enclosing = enclosing;
   }
 
+  void define(String name, Object value) {
+    values.put(name, value);
+  }
 
-   Object get(Token name) {
+  Object get(Token name) {
     if (values.containsKey(name.lexeme)) {
       return values.get(name.lexeme);
     }
@@ -26,11 +25,7 @@ class Environment {
         "Undefined variable '" + name.lexeme + "'.");
   }
 
-  void define(String name, Object value) {
-      values.put(name, value);
-  }
-
-  void assign(Token name, Object value) {
+    void assign(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {
       values.put(name.lexeme, value);
       return;
@@ -39,8 +34,6 @@ class Environment {
     throw new RuntimeError(name,
         "Undefined variable '" + name.lexeme + "'.");
   }
-
- 
 
 
 }
