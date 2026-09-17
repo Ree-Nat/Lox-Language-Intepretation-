@@ -60,6 +60,8 @@ public class Lox {
 
     
     inter.interpret(statements);
+
+    //challenge level 1
     if(repl_mode == true)
     {
       for(Stmt statement: statements)
