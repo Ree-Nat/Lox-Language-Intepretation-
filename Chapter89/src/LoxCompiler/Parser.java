@@ -9,6 +9,7 @@ class Parser {
 
   private static class ParseError extends RuntimeException {}
 
+
   private final List<Token> tokens;
   private int current = 0;
 
@@ -274,6 +275,7 @@ private Token advance() {
     if (match(IF)) return ifStatement();
     if (match(PRINT)) return printStatement();
     if (match(WHILE)) return whileStatement();
+    if (match(BREAK)) return breakStatement();
     if (match(LEFT_BRACE)) return new Stmt.Block(block());
     return expressionStatement();
   }
@@ -323,6 +325,13 @@ private Token advance() {
     return body; 
 
     // More here...
+  }
+
+//Chapter 9 challenge 3
+  private Stmt breakStatement() {
+      Token keyword = previous();
+      consume(SEMICOLON, "Expect ';' after 'break'.");
+      return new Stmt.Break(keyword);
   }
 
 

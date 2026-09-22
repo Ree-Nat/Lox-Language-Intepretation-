@@ -14,6 +14,22 @@ abstract class Stmt {
     R visitReturnStmt(Return stmt);
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
+    R visitBreakStmt(Break stmt);
+  }
+
+  static class Break extends Stmt
+  {
+    final Token keyword;
+
+    Break(Token keyword) 
+    {
+      this.keyword = keyword;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+          return visitor.visitBreakStmt(this);
+    }
   }
 
   // Nested Stmt classes here...
