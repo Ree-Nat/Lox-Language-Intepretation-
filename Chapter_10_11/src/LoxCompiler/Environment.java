@@ -28,6 +28,11 @@ public class Environment {
     return environment;
   }
 
+  void assignAt(int distance, Token name, Object value) {
+    ancestor(distance).values.put(name.lexeme, value);
+  }
+
+
   //challenge #2 for chapter 8, throws a runtime error if accessed variable is null
   Object get(Token name) {
     if (values.containsKey(name.lexeme)) {

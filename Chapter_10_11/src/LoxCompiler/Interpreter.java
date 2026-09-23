@@ -286,7 +286,13 @@ private boolean isEqual(Object a, Object b) {
 @Override
 public Object visitAssignExpr(Assign expr) {
     Object value = evaluate(expr.value);
-    environment.assign(expr.name, value);
+    Integer distance = locals.get(expr);
+    if (distance != null) {
+      environment.assignAt(distance, expr.name, value);
+    } else {
+      globals.assign(expr.name, value);
+    }
+
     return value;
 }
 
@@ -354,9 +360,17 @@ public Object visitThisExpr(This expr) {
 
 @Override
 public Object visitVariableExpr(Variable expr) {
-  return environment.get(expr.name);
+   return lookUpVariable(expr.name, expr);
 }
 
+private Object lookUpVariable(Token name, Expr expr) {
+    Integer distance = locals.get(expr);
+    if (distance != null) {
+      return environment.getAt(distance, name.lexeme);
+    } else {
+      return globals.get(name);
+    }
+  }
 @Override
 public Void visitBlockStmt(Block stmt) {
     executeBlock(stmt.statements, new Environment(environment));
