@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import src.LoxCompiler.Return;
 
 
 public class Lox {
@@ -57,6 +56,9 @@ public class Lox {
 
     // Stop if there was a syntax error.
     if (hadError) return;
+
+    Resolver resolver = new Resolver(inter);
+    resolver.resolve(statements);
 
     
     inter.interpret(statements);

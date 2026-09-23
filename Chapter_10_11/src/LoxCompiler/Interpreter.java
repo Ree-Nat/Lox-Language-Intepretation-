@@ -1,7 +1,9 @@
 package src.LoxCompiler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.RuntimeErrorException;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private List<Stmt> evaluatedExpressionStatements = new ArrayList<>();
     private static class BreakException extends RuntimeException {}
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
     final Environment globals = new Environment();
     private Environment environment = globals;
@@ -89,6 +92,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   private void execute(Stmt stmt) {
     stmt.accept(this);
+  }
+
+  void resolve(Expr expr, int depth) {
+    locals.put(expr, depth);
   }
 
   void executeBlock(List<Stmt> statements,
