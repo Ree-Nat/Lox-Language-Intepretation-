@@ -23,6 +23,7 @@ import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.If;
 import src.LoxCompiler.Stmt.Return;
 import src.LoxCompiler.Stmt.While;
+import src.LoxCompiler.Lox;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -284,11 +285,15 @@ private boolean isEqual(Object a, Object b) {
 
 //Assigns a variable
 @Override
-public Object visitAssignExpr(Assign expr) {
+public Object visitAssignExpr(Assign expr) throws RuntimeException{
     Object value = evaluate(expr.value);
     Integer distance = locals.get(expr);
     if (distance != null) {
-      environment.assignAt(distance, expr.name, value);
+      if(value == null)
+      {
+        throw new RuntimeErrorException(new Error(), "Uninitialized variable: " + expr.toString());
+      }
+    environment.assignAt(distance, expr.name, value);
     } else {
       globals.assign(expr.name, value);
     }
