@@ -3,6 +3,12 @@ package src.LoxCompiler;
 
 import java.util.List;
 
+interface FunctionNodeI {
+  List<Token> params() ;
+  List<Stmt> body() ;
+  String getName();
+}
+
 abstract class Stmt {
   interface Visitor<R> {
     R visitBlockStmt(Block stmt);
@@ -15,7 +21,9 @@ abstract class Stmt {
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
     R visitBreakStmt(Break stmt);
+    R visitLambda(Lambda stmt);
   }
+
 
   static class Break extends Stmt
   {
@@ -82,7 +90,7 @@ abstract class Stmt {
   }
 //< stmt-expression
 //> stmt-function
-  static class Function extends Stmt {
+  static class Function extends Stmt implements FunctionNodeI{
     Function(Token name, List<Token> params, List<Stmt> body) {
       this.name = name;
       this.params = params;
@@ -93,11 +101,61 @@ abstract class Stmt {
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitFunctionStmt(this);
     }
-
     final Token name;
     final List<Token> params;
     final List<Stmt> body;
+    @Override
+    public List<Token> params() {
+      return this.params;
+    }
+
+    @Override
+    public List<Stmt> body() {
+      return this.body;
+    }
+
+    @Override
+    public String getName() {
+      return this.name.toString();
+    }
   }
+
+  static class Lambda extends Stmt implements  FunctionNodeI{
+    Lambda(List<Token> params, List<Stmt> body) {
+      this.params = params;
+      this.body = body;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitLambda(this);
+    }
+
+    final List<Token> params;
+    final List<Stmt> body;
+    @Override
+    public List<Token> params() {
+      return this.params;
+    }
+
+    @Override
+    public List<Stmt> body() {
+      return this.body;
+    }
+
+    @Override 
+    public String getName() {
+      return null;
+    }
+    {
+    
+    }
+  }
+
+
+
+
+  
 //< stmt-function
 //> stmt-if
   static class If extends Stmt {

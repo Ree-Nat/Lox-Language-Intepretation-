@@ -119,6 +119,29 @@ private Expr comparison() {
     return expr;
   }
 
+private Stmt.Lambda lambda()
+{
+    Token name = consume(IDENTIFIER, "Expect ( after expression");
+    consume(LEFT_PAREN, "Expect '(' after " + " lambda function");
+    List<Token> shared_parameters = new ArrayList<>();
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (shared_parameters.size() >= 255) {
+          error(peek(), "Can't have more than 255 parameters.");
+        }
+
+        shared_parameters.add(
+            consume(IDENTIFIER, "Expect parameter name."));
+      } while (match(COMMA));
+    }
+    consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+    consume(LEFT_BRACE, "Expect '{'" + " in lambda body");
+    List<Stmt> shared_body = block();
+    return new Stmt.Lambda(shared_parameters, shared_body);
+
+}
+
 
 private Expr term() {
 

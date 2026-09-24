@@ -21,6 +21,7 @@ import src.LoxCompiler.Stmt.Break;
 import src.LoxCompiler.Stmt.Class;
 import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.If;
+import src.LoxCompiler.Stmt.Lambda;
 import src.LoxCompiler.Stmt.Return;
 import src.LoxCompiler.Stmt.While;
 import src.LoxCompiler.Lox;
@@ -283,7 +284,7 @@ private boolean isEqual(Object a, Object b) {
   }
 
 
-//Assigns a variable
+//Chapter 10 Challenge problem 3
 @Override
 public Object visitAssignExpr(Assign expr) throws RuntimeException{
     Object value = evaluate(expr.value);
@@ -395,6 +396,7 @@ public Void visitFunctionStmt(Function stmt) {
     return null;
 }
 
+
 @Override
 public Void visitIfStmt(Stmt.If stmt) {
     if (isTruthy(evaluate(stmt.condition))) {
@@ -444,6 +446,13 @@ public Void visitWhileStmt(Stmt.While stmt) {
 @Override
 public Void visitBreakStmt(Break stmt) {
   throw new BreakException();
+}
+
+@Override
+public Void visitLambda(Lambda stmt) {
+    LoxFunction function = new LoxFunction(stmt, environment);
+    environment.define(null, function);
+    return null;
 }
 }
 

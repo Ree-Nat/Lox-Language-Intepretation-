@@ -1,6 +1,8 @@
 package src.LoxCompiler;
 
 import src.LoxCompiler.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   private final Stack<Map<String, Boolean>> scopes = new Stack<>();
   private FunctionType currentFunction = FunctionType.NONE;
 
+  private final Stack<ArrayList> localVariableScope = new Stack<>();
+
+
   Resolver(Interpreter interpreter) {
     this.interpreter = interpreter;
   }
@@ -60,10 +65,14 @@ private enum FunctionType {
 
   private void endScope() {
     scopes.pop();
+
+    localVariableScope.pop();
   }
 
 private void beginScope() {
     scopes.push(new HashMap<String, Boolean>());
+
+    localVariableScope.push((new ArrayList<Integer>()));
   }
 
 private void resolve(Expr expr) {
@@ -253,6 +262,13 @@ private void resolve(Expr expr) {
         scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
       Lox.error(expr.name,
           "Can't read local variable in its own initializer.");
+
+
+      if(!localVariableScope.isEmpty() && localVariableScope.contains(expr.name))
+      {
+        localVariableScope.remove(expr.name);
+      }
+
     }
 
     resolveLocal(expr, expr.name);
