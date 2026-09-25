@@ -1,12 +1,14 @@
 //> Appendix II stmt
 package src.LoxCompiler;
 
+import static src.LoxCompiler.TokenType.LAMBDA;
+
 import java.util.List;
 
 interface FunctionNodeI {
   List<Token> params() ;
   List<Stmt> body() ;
-  String getName();
+  Token getName();
 }
 
 abstract class Stmt {
@@ -115,8 +117,8 @@ abstract class Stmt {
     }
 
     @Override
-    public String getName() {
-      return this.name.toString();
+    public Token getName() {
+      return this.name;
     }
   }
 
@@ -144,7 +146,7 @@ abstract class Stmt {
     }
 
     @Override 
-    public String getName() {
+    public Token getName() {
       return null;
     }
     {

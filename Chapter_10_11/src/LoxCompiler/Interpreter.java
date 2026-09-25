@@ -30,10 +30,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private List<Stmt> evaluatedExpressionStatements = new ArrayList<>();
     private static class BreakException extends RuntimeException {}
-    private final Map<Expr, Integer> locals = new HashMap<>();
+    //private final Map<Expr, Integer> locals = new HashMap<>();
 
-    final Environment globals = new Environment();
-    private Environment environment = globals;
+    //For chapter 11 
+    private final Map<Expr, Integer>  locals = new HashMap<>();
+    private final Map<Expr, Integer> slots = new HashMap<>();
+
+    final IntegerEnvironment globals = new IntegerEnvironment();
+    private IntegerEnvironment environment = globals;
 
 
     Interpreter() {
@@ -96,13 +100,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     stmt.accept(this);
   }
 
-  void resolve(Expr expr, int depth) {
+  void resolve(Expr expr, int depth, int slot) {
     locals.put(expr, depth);
+    slots.put(expr, slot);
   }
 
   void executeBlock(List<Stmt> statements,
-                    Environment environment) {
-    Environment previous = this.environment;
+                    IntegerEnvironment environment) {
+    IntegerEnvironment previous = this.environment;
     try {
       this.environment = environment;
 
@@ -294,7 +299,7 @@ public Object visitAssignExpr(Assign expr) throws RuntimeException{
       {
         throw new RuntimeErrorException(new Error(), "Uninitialized variable: " + expr.toString());
       }
-    environment.assignAt(distance, expr.name, value);
+    environment.assignAt(distance, slots.get(expr), value);
     } else {
       globals.assign(expr.name, value);
     }
@@ -379,7 +384,7 @@ private Object lookUpVariable(Token name, Expr expr) {
   }
 @Override
 public Void visitBlockStmt(Block stmt) {
-    executeBlock(stmt.statements, new Environment(environment));
+    executeBlock(stmt.statements, new IntegerEnvironment(environment));
     return null;
 }
 
