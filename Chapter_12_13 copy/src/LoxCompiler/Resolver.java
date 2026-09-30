@@ -1,37 +1,16 @@
 package src.LoxCompiler;
 
-import src.LoxCompiler.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
-import src.LoxCompiler.Expr.Assign;
-import src.LoxCompiler.Expr.Binary;
-import src.LoxCompiler.Expr.Call;
 import src.LoxCompiler.Expr.Get;
-import src.LoxCompiler.Expr.Grouping;
-import src.LoxCompiler.Expr.Literal;
-import src.LoxCompiler.Expr.Logical;
-import src.LoxCompiler.Expr.Set;
 import src.LoxCompiler.Expr.Super;
-import src.LoxCompiler.Expr.This;
-import src.LoxCompiler.Expr.Unary;
-import src.LoxCompiler.Expr.Variable;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
-import src.LoxCompiler.Stmt.Class;
-import src.LoxCompiler.Stmt.Expression;
-import src.LoxCompiler.Stmt.Function;
-import src.LoxCompiler.Stmt.If;
-import src.LoxCompiler.Stmt.Lambda;
-import src.LoxCompiler.Stmt.Print;
-import src.LoxCompiler.Stmt.Return;
 import src.LoxCompiler.Stmt.Var;
-import src.LoxCompiler.Stmt.While;
-
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   private final Interpreter interpreter;
   private final Stack<Map<String, Variable>> scopes = new Stack<>();
@@ -51,12 +30,26 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private Variable(int slot) {
       this.slot = slot;
     }
+
+    public boolean getisDefined()
+    {
+      return this.isDefined;
+    }
   }
 
 private enum FunctionType {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD,
+    INITIALIZER  
   }
+
+private enum ClassType {
+    NONE,
+    CLASS
+  }
+
+  private ClassType currentClass = ClassType.NONE;
 
   
 
@@ -96,9 +89,30 @@ private void resolve(Expr expr) {
   }
 
   @Override
-  public Void visitClassStmt(Class stmt) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitClassStmt'");
+  public Void visitClassStmt(Stmt.Class stmt) {
+
+    ClassType enclosingClass = currentClass;
+    currentClass = ClassType.CLASS;
+
+    declare(stmt.name);
+    define(stmt.name);
+
+    beginScope();
+    scopes.peek().put("this", new Variable(scopes.size())); //!!!!
+
+    for (Stmt.Function method : stmt.methods) {
+      FunctionType declaration = FunctionType.METHOD;
+
+      if (method.name.lexeme.equals("init")) {
+        declaration = FunctionType.INITIALIZER;
+      }
+      
+      resolveFunction(method, declaration); 
+    }
+
+    endScope();
+     currentClass = enclosingClass;
+    return null;
   }
 
   @Override
@@ -147,10 +161,14 @@ private void resolve(Expr expr) {
   
   @Override
   public Void visitReturnStmt(Stmt.Return stmt) {
-      if (currentFunction == FunctionType.NONE) {
+    if (currentFunction == FunctionType.NONE) {
       Lox.error(stmt.keyword, "Can't return from top-level code.");
       }
     if (stmt.value != null) {
+        if (currentFunction == FunctionType.INITIALIZER) {
+        Lox.error(stmt.keyword,
+            "Can't return a value from an initializer.");
+      }
       resolve(stmt.value);
     }
     return null;
@@ -222,8 +240,8 @@ private void resolve(Expr expr) {
 
   @Override
   public Void visitGetExpr(Get expr) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitGetExpr'");
+    resolve(expr.object);
+       return null;
   }
 
  @Override
@@ -244,10 +262,11 @@ private void resolve(Expr expr) {
     return null;
   }
 
-  @Override
-  public Void visitSetExpr(Set expr) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitSetExpr'");
+   @Override
+  public Void visitSetExpr(Expr.Set expr) {
+    resolve(expr.value);
+    resolve(expr.object);
+    return null;
   }
 
   @Override
@@ -257,10 +276,16 @@ private void resolve(Expr expr) {
   }
 
   @Override
-  public Void visitThisExpr(This expr) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitThisExpr'");
+  public Void visitThisExpr(Expr.This expr) {
+      if (currentClass == ClassType.NONE) {
+      Lox.error(expr.keyword,
+          "Can't use 'this' outside of a class.");
+      return null;
+    }
+    resolveLocal(expr, expr.keyword);
+    return null;
   }
+
 
   @Override
   public Void visitUnaryExpr(Expr.Unary expr) {
@@ -287,22 +312,15 @@ private void resolve(Expr expr) {
     return null;
   }
 
-   private void resolveLocal(Expr expr, Token name) {
-     for (int i = scopes.size() - 1; i >= 0; i--) {
-      Map<String, Variable> scope = scopes.get(i);
-      if (scope.containsKey(name.lexeme)) {
-        interpreter.resolve(expr, scopes.size() - 1 - i,
-            scope.get(name.lexeme).slot);
+private void resolveLocal(Expr expr, Token name) {
+    for (int i = scopes.size() - 1; i >= 0; i--) {
+      if (scopes.get(i).containsKey(name.lexeme)) {
+        interpreter.resolve(expr, scopes.size() - 1 - i);
         return;
       }
     }
   }
 
-   @Override
-   public Void visitLambda(Lambda stmt) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitLambda'");
-   }
 
    
 

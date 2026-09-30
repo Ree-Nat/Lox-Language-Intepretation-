@@ -33,24 +33,16 @@ public class Environment {
   }
 
 
-  //challenge #2 for chapter 8, throws a runtime error if accessed variable is null
   Object get(Token name) {
-    if (values.containsKey(name.lexeme)) {
-
-      if(values.get(name.lexeme) == null)
-      {
-        throw new RuntimeError(name,
-        "Undefined variable '" + name.lexeme + "'.");
+      if (values.containsKey(name.lexeme)) {
+        return values.get(name.lexeme);
       }
 
-      return values.get(name.lexeme);
+      if (enclosing != null) return enclosing.get(name);
+      throw new RuntimeError(name,
+          "Undefined variable '" + name.lexeme + "'.");
     }
-
   
-
-    throw new RuntimeError(name,
-        "Undefined variable '" + name.lexeme + "'.");
-  }
 
     void assign(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {

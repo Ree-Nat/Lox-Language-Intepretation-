@@ -1,5 +1,4 @@
 package src.LoxCompiler;
-import src.LoxCompiler.*;
 
 import src.LoxCompiler.Expr.Assign;
 import src.LoxCompiler.Expr.Call;

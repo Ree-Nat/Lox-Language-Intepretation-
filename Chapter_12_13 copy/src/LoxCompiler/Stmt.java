@@ -5,11 +5,7 @@ import static src.LoxCompiler.TokenType.LAMBDA;
 
 import java.util.List;
 
-interface FunctionNodeI {
-  List<Token> params() ;
-  List<Stmt> body() ;
-  Token getName();
-}
+
 
 abstract class Stmt {
   interface Visitor<R> {
@@ -23,7 +19,8 @@ abstract class Stmt {
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
     R visitBreakStmt(Break stmt);
-    R visitLambda(Lambda stmt);
+  
+
   }
 
 
@@ -60,12 +57,11 @@ abstract class Stmt {
 //> stmt-class
   static class Class extends Stmt {
     Class(Token name,
-          Expr.Variable superclass,
           List<Stmt.Function> methods) {
       this.name = name;
-      this.superclass = superclass;
       this.methods = methods;
     }
+
 
     @Override
     <R> R accept(Visitor<R> visitor) {
@@ -73,7 +69,6 @@ abstract class Stmt {
     }
 
     final Token name;
-    final Expr.Variable superclass;
     final List<Stmt.Function> methods;
   }
 //< stmt-class
@@ -92,7 +87,7 @@ abstract class Stmt {
   }
 //< stmt-expression
 //> stmt-function
-  static class Function extends Stmt implements FunctionNodeI{
+  static class Function extends Stmt {
     Function(Token name, List<Token> params, List<Stmt> body) {
       this.name = name;
       this.params = params;
@@ -106,53 +101,10 @@ abstract class Stmt {
     final Token name;
     final List<Token> params;
     final List<Stmt> body;
-    @Override
-    public List<Token> params() {
-      return this.params;
-    }
 
-    @Override
-    public List<Stmt> body() {
-      return this.body;
-    }
-
-    @Override
-    public Token getName() {
-      return this.name;
-    }
   }
 
-  static class Lambda extends Stmt implements  FunctionNodeI{
-    Lambda(List<Token> params, List<Stmt> body) {
-      this.params = params;
-      this.body = body;
-    }
 
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitLambda(this);
-    }
-
-    final List<Token> params;
-    final List<Stmt> body;
-    @Override
-    public List<Token> params() {
-      return this.params;
-    }
-
-    @Override
-    public List<Stmt> body() {
-      return this.body;
-    }
-
-    @Override 
-    public Token getName() {
-      return null;
-    }
-    {
-    
-    }
-  }
 
 
 

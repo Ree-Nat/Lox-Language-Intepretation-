@@ -6,38 +6,25 @@ import java.util.List;
 import java.util.Map;
 
 import javax.management.RuntimeErrorException;
-import java.util.ArrayList;
 
 import src.LoxCompiler.Expr.Assign;
 import src.LoxCompiler.Expr.Call;
-import src.LoxCompiler.Expr.Get;
 import src.LoxCompiler.Expr.Logical;
-import src.LoxCompiler.Expr.Set;
 import src.LoxCompiler.Expr.Super;
-import src.LoxCompiler.Expr.This;
 import src.LoxCompiler.Expr.Variable;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
-import src.LoxCompiler.Stmt.Class;
 import src.LoxCompiler.Stmt.Function;
-import src.LoxCompiler.Stmt.If;
-import src.LoxCompiler.Stmt.Lambda;
 import src.LoxCompiler.Stmt.Return;
-import src.LoxCompiler.Stmt.While;
-import src.LoxCompiler.Lox;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private List<Stmt> evaluatedExpressionStatements = new ArrayList<>();
     private static class BreakException extends RuntimeException {}
-    //private final Map<Expr, Integer> locals = new HashMap<>();
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
-    //For chapter 11 
-    private final Map<Expr, Integer>  locals = new HashMap<>();
-    private final Map<Expr, Integer> slots = new HashMap<>();
-
-    final IntegerEnvironment globals = new IntegerEnvironment();
-    private IntegerEnvironment environment = globals;
+    final Environment globals = new Environment();
+    private Environment environment = globals;
 
 
     Interpreter() {
@@ -100,14 +87,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     stmt.accept(this);
   }
 
-  void resolve(Expr expr, int depth, int slot) {
+  void resolve(Expr expr, int depth) {
     locals.put(expr, depth);
-    slots.put(expr, slot);
   }
 
   void executeBlock(List<Stmt> statements,
-                    IntegerEnvironment environment) {
-    IntegerEnvironment previous = this.environment;
+                    Environment environment) {
+    Environment previous = this.environment;
     try {
       this.environment = environment;
 
@@ -299,7 +285,7 @@ public Object visitAssignExpr(Assign expr) throws RuntimeException{
       {
         throw new RuntimeErrorException(new Error(), "Uninitialized variable: " + expr.toString());
       }
-    environment.assignAt(distance, slots.get(expr), value);
+    environment.assignAt(distance, expr.name, value);
     } else {
       globals.assign(expr.name, value);
     }
@@ -332,11 +318,16 @@ public Object visitCallExpr(Call expr) {
     return function.call(this, arguments);
 }
 
-@Override
-public Object visitGetExpr(Get expr) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitGetExpr'");
-}
+  @Override
+  public Object visitGetExpr(Expr.Get expr) {
+    Object object = evaluate(expr.object);
+    if (object instanceof LoxInstance) {
+      return ((LoxInstance) object).get(expr.name);
+    }
+
+    throw new RuntimeError(expr.name,
+        "Only instances have properties.");
+  }
 
 @Override
 public Object visitLogicalExpr(Logical expr) {
@@ -351,11 +342,19 @@ public Object visitLogicalExpr(Logical expr) {
     return evaluate(expr.right);
 }
 
-@Override
-public Object visitSetExpr(Set expr) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitSetExpr'");
-}
+  @Override
+  public Object visitSetExpr(Expr.Set expr) {
+    Object object = evaluate(expr.object);
+
+    if (!(object instanceof LoxInstance)) { 
+      throw new RuntimeError(expr.name,
+                             "Only instances have fields.");
+    }
+
+    Object value = evaluate(expr.value);
+    ((LoxInstance)object).set(expr.name, value);
+    return value;
+  }
 
 @Override
 public Object visitSuperExpr(Super expr) {
@@ -363,11 +362,10 @@ public Object visitSuperExpr(Super expr) {
   throw new UnsupportedOperationException("Unimplemented method 'visitSuperExpr'");
 }
 
-@Override
-public Object visitThisExpr(This expr) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitThisExpr'");
-}
+  @Override
+  public Object visitThisExpr(Expr.This expr) {
+    return lookUpVariable(expr.keyword, expr);
+  }
 
 @Override
 public Object visitVariableExpr(Variable expr) {
@@ -384,21 +382,33 @@ private Object lookUpVariable(Token name, Expr expr) {
   }
 @Override
 public Void visitBlockStmt(Block stmt) {
-    executeBlock(stmt.statements, new IntegerEnvironment(environment));
+    executeBlock(stmt.statements, new Environment(environment));
     return null;
 }
 
-@Override
-public Void visitClassStmt(Class stmt) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitClassStmt'");
-}
+
+
+  @Override
+  public Void visitClassStmt(Stmt.Class stmt) {
+    environment.define(stmt.name.lexeme, null);
+    Map<String, LoxFunction> methods = new HashMap<>();
+    for (Stmt.Function method : stmt.methods) {
+      LoxFunction function = new LoxFunction(method, environment,
+      method.name.lexeme.equals("init"));
+      methods.put(method.name.lexeme, function);
+    }
+
+    LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+    environment.assign(stmt.name, klass);
+    return null;
+  }
 
 @Override
 public Void visitFunctionStmt(Function stmt) {
-    LoxFunction function = new LoxFunction(stmt, environment);
-    environment.define(stmt.name.lexeme, function);
-    return null;
+  LoxFunction function = new LoxFunction(stmt, environment,
+                                           false);
+  environment.define(stmt.name.lexeme, function);
+  return null;
 }
 
 
@@ -451,13 +461,6 @@ public Void visitWhileStmt(Stmt.While stmt) {
 @Override
 public Void visitBreakStmt(Break stmt) {
   throw new BreakException();
-}
-
-@Override
-public Void visitLambda(Lambda stmt) {
-    LoxFunction function = new LoxFunction(stmt, environment);
-    environment.define(null, function);
-    return null;
 }
 }
 

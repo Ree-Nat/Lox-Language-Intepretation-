@@ -1,6 +1,5 @@
 package src.LoxCompiler;
 
-import src.LoxCompiler.Stmt.Lambda;
 
 enum TokenType {
   // Single-character tokens.
