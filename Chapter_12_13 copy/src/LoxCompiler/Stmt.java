@@ -56,10 +56,11 @@ abstract class Stmt {
 //< stmt-block
 //> stmt-class
   static class Class extends Stmt {
-    Class(Token name,
+    Class(Token name, Expr.Variable superclass,
           List<Stmt.Function> methods) {
       this.name = name;
       this.methods = methods;
+      this.superclass = superclass;
     }
 
 
@@ -68,6 +69,7 @@ abstract class Stmt {
       return visitor.visitClassStmt(this);
     }
 
+    final Expr.Variable superclass;
     final Token name;
     final List<Stmt.Function> methods;
   }

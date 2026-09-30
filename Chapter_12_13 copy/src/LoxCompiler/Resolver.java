@@ -11,9 +11,9 @@ import src.LoxCompiler.Expr.Super;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
 import src.LoxCompiler.Stmt.Var;
-class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
+class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
   private final Interpreter interpreter;
-  private final Stack<Map<String, Variable>> scopes = new Stack<>();
+  private final Stack<Map<String, Boolean>> scopes = new Stack<>();
   private FunctionType currentFunction = FunctionType.NONE;
 
   private final Stack<ArrayList> localVariableScope = new Stack<>();
@@ -41,12 +41,13 @@ private enum FunctionType {
     NONE,
     FUNCTION,
     METHOD,
-    INITIALIZER  
+    INITIALIZER 
   }
 
 private enum ClassType {
     NONE,
-    CLASS
+    CLASS,
+    SUBCLASS
   }
 
   private ClassType currentClass = ClassType.NONE;
@@ -75,9 +76,8 @@ private enum ClassType {
   }
 
 private void beginScope() {
-    scopes.push(new HashMap<String, Variable>());
-
-    localVariableScope.push((new ArrayList<Integer>()));
+    scopes.push(new HashMap<String, Boolean>());
+    
   }
 
 private void resolve(Expr expr) {
@@ -88,8 +88,10 @@ private void resolve(Expr expr) {
     stmt.accept(this);
   }
 
-  @Override
+@Override
   public Void visitClassStmt(Stmt.Class stmt) {
+
+    
 
     ClassType enclosingClass = currentClass;
     currentClass = ClassType.CLASS;
@@ -97,8 +99,24 @@ private void resolve(Expr expr) {
     declare(stmt.name);
     define(stmt.name);
 
+    if (stmt.superclass != null &&
+        stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+      Lox.error(stmt.superclass.name,
+          "A class can't inherit from itself.");
+    }
+
+    if (stmt.superclass != null) {
+      currentClass = ClassType.SUBCLASS;
+      resolve(stmt.superclass);
+    }
+
+      if (stmt.superclass != null) {
+      beginScope();
+      scopes.peek().put("super", true);
+    }
+
     beginScope();
-    scopes.peek().put("this", new Variable(scopes.size())); //!!!!
+    scopes.peek().put("this", true); //!!!!
 
     for (Stmt.Function method : stmt.methods) {
       FunctionType declaration = FunctionType.METHOD;
@@ -111,6 +129,8 @@ private void resolve(Expr expr) {
     }
 
     endScope();
+
+     if (stmt.superclass != null) endScope();
      currentClass = enclosingClass;
     return null;
   }
@@ -185,20 +205,19 @@ private void resolve(Expr expr) {
   }
 
  private void declare(Token name) {
-      if (scopes.isEmpty()) return;
+    if (scopes.isEmpty()) return;
 
-    Map<String, Variable> scope = scopes.peek();
+    Map<String, Boolean> scope = scopes.peek();
+//> duplicate-variable
     if (scope.containsKey(name.lexeme)) {
       Lox.error(name,
-          "Already variable with this name in this scope.");
-    }
-
-    scope.put(name.lexeme, new Variable(scope.size()));
+          "Already a variable with this name in this scope.");
   }
+}
 
   private void define(Token name) {
-    if (scopes.isEmpty()) return;
-    scopes.peek().get(name.lexeme).isDefined = true;
+     if (scopes.isEmpty()) return;
+    scopes.peek().put(name.lexeme, true);
   }
   @Override
   public Void visitWhileStmt(Stmt.While stmt) {
@@ -270,9 +289,17 @@ private void resolve(Expr expr) {
   }
 
   @Override
-  public Void visitSuperExpr(Super expr) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'visitSuperExpr'");
+  public Void visitSuperExpr(Expr.Super expr) {
+
+      if (currentClass == ClassType.NONE) {
+      Lox.error(expr.keyword,
+          "Can't use 'super' outside of a class.");
+    } else if (currentClass != ClassType.SUBCLASS) {
+      Lox.error(expr.keyword,
+          "Can't use 'super' in a class with no superclass.");
+    }
+    resolveLocal(expr, expr.keyword);
+    return null;
   }
 
   @Override
@@ -295,17 +322,10 @@ private void resolve(Expr expr) {
 
   @Override
   public Void visitVariableExpr(Expr.Variable expr) {
-      if (!scopes.isEmpty() &&
-        scopes.peek().containsKey(expr.name.lexeme) && !scopes.peek().get(expr.name.lexeme).isDefined) {
+     if (!scopes.isEmpty() &&
+        scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
       Lox.error(expr.name,
           "Can't read local variable in its own initializer.");
-
-
-      if(!localVariableScope.isEmpty() && localVariableScope.contains(expr.name))
-      {
-        localVariableScope.remove(expr.name);
-      }
-
     }
 
     resolveLocal(expr, expr.name);
