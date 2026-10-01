@@ -1,5 +1,6 @@
 package src.LoxCompiler;
 
+import java.lang.classfile.Superclass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -237,21 +238,12 @@ private boolean isTruthy(Object object) {
 private void checkNumberOperands(Token operator,
                                    Object left, Object right) {
 
-    if (left instanceof Double && right instanceof Double && operator.type == TokenType.SLASH)
-      {
-        if ((Double) right == 0)
-        {
-          throw new RuntimeError(operator, "Divisor can not be 0");
-        }
-      else
-      {
-        return;
-      }
-
-      };
-    
-   
+  if (!(left instanceof Double && right instanceof Double)) {
     throw new RuntimeError(operator, "Operands must be numbers.");
+  }
+  if (operator.type == TokenType.SLASH && (double) right == 0) {
+    throw new RuntimeError(operator, "Divisor can not be 0");
+  }
   }
 
 
@@ -414,15 +406,25 @@ public Void visitBlockStmt(Block stmt) {
 
 
     environment.define(stmt.name.lexeme, null);
+    Map<String, LoxFunction> staticMethods = new HashMap<>();
+    for (Stmt.Function method : stmt.staticMethods) {
+      LoxFunction function = new LoxFunction(method, environment,
+      method.name.lexeme.equals("init"));
+      staticMethods.put(method.name.lexeme, function);
+    }
+
+    LoxClass staticklass = new LoxClass(null, stmt.name.lexeme + " metaclass", (LoxClass) superclass, staticMethods);
+
+     environment.define(stmt.name.lexeme, null);
     Map<String, LoxFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
       LoxFunction function = new LoxFunction(method, environment,
       method.name.lexeme.equals("init"));
-      methods.put(method.name.lexeme, function);
+      staticMethods.put(method.name.lexeme, function);
     }
 
-    LoxClass klass = new LoxClass(stmt.name.lexeme,
-        (LoxClass)superclass, methods);
+    LoxClass klass = new LoxClass(staticklass, stmt.name.lexeme, (LoxClass) superclass, methods);
+
     environment.assign(stmt.name, klass);
     return null;
   }

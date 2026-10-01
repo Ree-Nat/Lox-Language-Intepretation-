@@ -10,6 +10,7 @@ import src.LoxCompiler.Expr.Get;
 import src.LoxCompiler.Expr.Super;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
+import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.Var;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
   private final Interpreter interpreter;
@@ -47,7 +48,8 @@ private enum FunctionType {
 private enum ClassType {
     NONE,
     CLASS,
-    SUBCLASS
+    SUBCLASS,
+    STATIC
   }
 
   private ClassType currentClass = ClassType.NONE;
@@ -72,7 +74,7 @@ private enum ClassType {
   private void endScope() {
     scopes.pop();
 
-    localVariableScope.pop();
+    //localVariableScope.pop();
   }
 
 private void beginScope() {
@@ -128,6 +130,9 @@ private void resolve(Expr expr) {
       resolveFunction(method, declaration); 
     }
 
+    for (Stmt.Function method : stmt.staticMethods) {
+            resolveFunction(method, FunctionType.METHOD);
+        }
     endScope();
 
      if (stmt.superclass != null) endScope();

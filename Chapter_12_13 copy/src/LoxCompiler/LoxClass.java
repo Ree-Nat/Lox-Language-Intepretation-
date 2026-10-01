@@ -2,13 +2,14 @@ package src.LoxCompiler;
 import java.util.List;
 import java.util.Map;
 
-class LoxClass implements LoxCallable {
+class LoxClass extends LoxInstance implements LoxCallable {
    private final Map<String, LoxFunction> methods;
    final String name;
    final LoxClass superclass;
 
-  LoxClass(String name, LoxClass superclass,
+  LoxClass(LoxClass staticKlass, String name, LoxClass superclass,
            Map<String, LoxFunction> methods) {
+    super(staticKlass);
     this.superclass = superclass;
     this.name = name;
     this.methods = methods;
@@ -17,6 +18,16 @@ class LoxClass implements LoxCallable {
   @Override
   public String toString() {
     return name;
+  }
+
+  public Object callStatic(Interpreter interpreter, List<Object> arguments)
+  {
+    LoxInstance instance = new LoxInstance(this);
+    LoxFunction initializer = findMethod("init");
+    if (initializer != null) {
+      initializer.bind(instance).call(interpreter, arguments);
+    }
+    return instance; 
   }
 
   @Override
