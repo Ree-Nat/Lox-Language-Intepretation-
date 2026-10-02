@@ -121,6 +121,7 @@ private void resolve(Expr expr) {
 
     beginScope();
     scopes.peek().put("this", true); //!!!!
+    scopes.peek().put("inner", true); //!!!!
 
     for (Stmt.Function method : stmt.methods) {
       FunctionType declaration = FunctionType.METHOD;

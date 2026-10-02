@@ -17,6 +17,15 @@ public class LoxGetter {
         return new LoxGetter(declaration, environment);
     }
 
+    LoxGetter bind(LoxInstance instance, LoxFunction inner)
+    {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        environment.define("inner", instance);
+        return new LoxGetter(declaration,environment);
+
+    }
+
     Object call(Interpreter interpreter)
     {
         Environment environment = new Environment(closure);
