@@ -10,8 +10,10 @@ import src.LoxCompiler.Expr.Get;
 import src.LoxCompiler.Expr.Super;
 import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
+
 import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.Var;
+import src.LoxCompiler.Stmt.getSetFunction;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
   private final Interpreter interpreter;
   private final Stack<Map<String, Boolean>> scopes = new Stack<>();
@@ -345,6 +347,12 @@ private void resolveLocal(Expr expr, Token name) {
       }
     }
   }
+
+@Override
+public Void visitGetSetFunction(getSetFunction getSetFunction) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitGetSetFunction'");
+}
 
 
    

@@ -5,8 +5,6 @@ import static src.LoxCompiler.TokenType.LAMBDA;
 
 import java.util.List;
 
-
-
 abstract class Stmt {
   interface Visitor<R> {
     R visitBlockStmt(Block stmt);
@@ -19,6 +17,7 @@ abstract class Stmt {
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
     R visitBreakStmt(Break stmt);
+    R visitGetSetFunction(getSetFunction getSetFunction);
   
 
   }
@@ -57,12 +56,15 @@ abstract class Stmt {
 //> stmt-class
   static class Class extends Stmt {
     Class(Token name, Expr.Variable superclass,
-          List<Stmt.Function> methods, List<Stmt.Function> staticMethods) {
+          List<Stmt.Function> methods, List<Stmt.Function> staticMethods, List<Stmt.getSetFunction> gettersAndSetters) {
       this.name = name;
       this.methods = methods;
       this.superclass = superclass;
       this.staticMethods = staticMethods;
+      this.gettersAndSetters = gettersAndSetters;
     }
+
+
 
 
     @Override
@@ -74,6 +76,8 @@ abstract class Stmt {
     final Token name;
     final List<Stmt.Function> methods;
     final List<Stmt.Function> staticMethods;
+    final List<Stmt.getSetFunction> gettersAndSetters;
+    
   }
 //< stmt-class
 //> stmt-expression
@@ -108,6 +112,21 @@ abstract class Stmt {
 
   }
 
+  
+  static class getSetFunction extends Stmt {
+      getSetFunction(Token name, List<Stmt> body) {
+        this.name = name;
+        this.body = body;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+        return visitor.visitGetSetFunction(this);
+      }
+      final Token name;
+      final List<Stmt> body;
+
+  }
 
 
 

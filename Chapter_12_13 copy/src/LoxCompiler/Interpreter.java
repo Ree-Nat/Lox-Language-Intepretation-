@@ -17,6 +17,7 @@ import src.LoxCompiler.Stmt.Block;
 import src.LoxCompiler.Stmt.Break;
 import src.LoxCompiler.Stmt.Function;
 import src.LoxCompiler.Stmt.Return;
+import src.LoxCompiler.Stmt.getSetFunction;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -409,18 +410,18 @@ public Void visitBlockStmt(Block stmt) {
     Map<String, LoxFunction> staticMethods = new HashMap<>();
     for (Stmt.Function method : stmt.staticMethods) {
       LoxFunction function = new LoxFunction(method, environment,
-      method.name.lexeme.equals("init"));
+      false);
       staticMethods.put(method.name.lexeme, function);
     }
 
     LoxClass staticklass = new LoxClass(null, stmt.name.lexeme + " metaclass", (LoxClass) superclass, staticMethods);
 
-     environment.define(stmt.name.lexeme, null);
+    //environment.define(stmt.name.lexeme, null);
     Map<String, LoxFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
       LoxFunction function = new LoxFunction(method, environment,
       method.name.lexeme.equals("init"));
-      staticMethods.put(method.name.lexeme, function);
+      methods.put(method.name.lexeme, function);
     }
 
     LoxClass klass = new LoxClass(staticklass, stmt.name.lexeme, (LoxClass) superclass, methods);
@@ -488,5 +489,13 @@ public Void visitWhileStmt(Stmt.While stmt) {
 public Void visitBreakStmt(Break stmt) {
   throw new BreakException();
 }
+
+@Override
+public Void visitGetSetFunction(getSetFunction getSetFunction) {
+  // TODO Auto-generated method stub
+  throw new UnsupportedOperationException("Unimplemented method 'visitGetSetFunction'");
+}
+
+
 }
 

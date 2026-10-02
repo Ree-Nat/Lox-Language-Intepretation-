@@ -101,16 +101,19 @@ class Parser {
 
     List<Stmt.Function> methods = new ArrayList<>(); //chapter 12 
     List<Stmt.Function> staticMethods = new ArrayList<>();
+    List<Stmt.getSetFunction> gettersAndSetters = new ArrayList<>();
     while (!check(RIGHT_BRACE) && !isAtEnd()) {
       Boolean isStaticMethod = match(CLASS);
       if(isStaticMethod)
         staticMethods.add(function("method"));
+      else if(check(IDENTIFIER) && tokens.get(current+1).type == LEFT_BRACE)
+        gettersAndSetters.add(getAndSet("Get and Set Method"));
       else methods.add(function("method"));
     }
 
     consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-    return new Stmt.Class(name, superclass, methods, staticMethods);
+    return new Stmt.Class(name, superclass, methods, staticMethods, gettersAndSetters);
   }
 
 private Expr equality() {
@@ -468,6 +471,13 @@ private Token advance() {
     consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
     List<Stmt> body = block();
     return new Stmt.Function(name, parameters, body);
+  }
+
+  private Stmt.getSetFunction getAndSet(String kind) {
+    Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+    consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    List<Stmt> body = block();
+    return new Stmt.getSetFunction(name, body); //treat get and set as null in parser
   }
 
   private List<Stmt> block() {
