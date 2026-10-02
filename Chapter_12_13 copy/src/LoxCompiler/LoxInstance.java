@@ -24,6 +24,25 @@ Object get(Token name) {
     LoxFunction method = klass.findMethod(name.lexeme);
     if (method != null) return method.bind(this);
 
+    LoxGetter getter = klass.findGetterMethod(name.lexeme);
+    if(getter != null) return getter.bind(this);
+
+    throw new RuntimeError(name, 
+        "Undefined property '" + name.lexeme + "'.");
+  }
+
+
+  Object get(Token name, Interpreter interpreter) {
+    if (fields.containsKey(name.lexeme)) {
+      return fields.get(name.lexeme);
+    }
+
+    LoxFunction method = klass.findMethod(name.lexeme);
+    if (method != null) return method.bind(this);
+
+    LoxGetter getter = klass.findGetterMethod(name.lexeme);
+    if(getter != null) return getter.bind(this).call(interpreter);
+
     throw new RuntimeError(name, 
         "Undefined property '" + name.lexeme + "'.");
   }
@@ -31,6 +50,8 @@ Object get(Token name) {
   void set(Token name, Object value) {
     fields.put(name.lexeme, value);
   }
+
+  
 
   
 }

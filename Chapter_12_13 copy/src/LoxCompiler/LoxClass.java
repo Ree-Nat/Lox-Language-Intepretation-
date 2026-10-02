@@ -1,4 +1,5 @@
 package src.LoxCompiler;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -6,6 +7,7 @@ class LoxClass extends LoxInstance implements LoxCallable {
    private final Map<String, LoxFunction> methods;
    final String name;
    final LoxClass superclass;
+   Map<String, LoxGetter> getters = new HashMap<>();
 
   LoxClass(LoxClass staticKlass, String name, LoxClass superclass,
            Map<String, LoxFunction> methods) {
@@ -18,6 +20,13 @@ class LoxClass extends LoxInstance implements LoxCallable {
   @Override
   public String toString() {
     return name;
+  }
+
+  LoxGetter findGetterMethod(String name)
+  {
+    if (getters.containsKey(name)) return getters.get(name);
+    if(superclass != null) return superclass.findGetterMethod(name);
+    return null;
   }
 
   public Object callStatic(Interpreter interpreter, List<Object> arguments)

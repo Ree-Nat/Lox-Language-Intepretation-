@@ -135,6 +135,16 @@ private void resolve(Expr expr) {
     for (Stmt.Function method : stmt.staticMethods) {
             resolveFunction(method, FunctionType.METHOD);
         }
+
+    for (Stmt.getSetFunction method : stmt.gettersAndSetters) {
+            FunctionType enclosing = currentFunction;
+            currentFunction= FunctionType.METHOD;
+            beginScope();
+            resolve(method.body);
+            endScope();
+            currentFunction = enclosing;
+        }
+
     endScope();
 
      if (stmt.superclass != null) endScope();

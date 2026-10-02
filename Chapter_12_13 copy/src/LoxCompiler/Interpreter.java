@@ -315,7 +315,7 @@ public Object visitCallExpr(Call expr) {
   public Object visitGetExpr(Expr.Get expr) {
     Object object = evaluate(expr.object);
     if (object instanceof LoxInstance) {
-      return ((LoxInstance) object).get(expr.name);
+      return ((LoxInstance) object).get(expr.name, this);
     }
 
     throw new RuntimeError(expr.name,
@@ -414,9 +414,16 @@ public Void visitBlockStmt(Block stmt) {
       staticMethods.put(method.name.lexeme, function);
     }
 
+    
+    Map<String, LoxGetter> getterMethods = new HashMap<>();
+    for(Stmt.getSetFunction getterMethod: stmt.gettersAndSetters)
+    {
+      getterMethods.put(getterMethod.name.lexeme, new LoxGetter(getterMethod, environment));
+    }
+  
+
     LoxClass staticklass = new LoxClass(null, stmt.name.lexeme + " metaclass", (LoxClass) superclass, staticMethods);
 
-    //environment.define(stmt.name.lexeme, null);
     Map<String, LoxFunction> methods = new HashMap<>();
     for (Stmt.Function method : stmt.methods) {
       LoxFunction function = new LoxFunction(method, environment,
@@ -424,7 +431,8 @@ public Void visitBlockStmt(Block stmt) {
       methods.put(method.name.lexeme, function);
     }
 
-    LoxClass klass = new LoxClass(staticklass, stmt.name.lexeme, (LoxClass) superclass, methods);
+    LoxClass klass = new LoxClass(staticklass, stmt.name.lexeme, (LoxClass) superclass, methods); 
+    klass.getters = getterMethods;
 
     environment.assign(stmt.name, klass);
     return null;
@@ -432,11 +440,9 @@ public Void visitBlockStmt(Block stmt) {
 
 @Override
 public Void visitFunctionStmt(Function stmt) {
-  LoxFunction function = new LoxFunction(stmt, environment,
-                                           false);
-  environment.define(stmt.name.lexeme, function);
   return null;
 }
+
 
 
 @Override
@@ -492,9 +498,10 @@ public Void visitBreakStmt(Break stmt) {
 
 @Override
 public Void visitGetSetFunction(getSetFunction getSetFunction) {
-  // TODO Auto-generated method stub
-  throw new UnsupportedOperationException("Unimplemented method 'visitGetSetFunction'");
+  return null;
 }
+
+
 
 
 }
